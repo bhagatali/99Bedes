@@ -45,7 +45,7 @@ angular.module('myApp.contacts', ['ngRoute','firebase'])
     $scope.$watch('msg',function(){
         $timeout(function(){
             $scope.msg = false;
-        },5000)    
+        },3000)    
     });
     
     $scope.submitAddForm = function(){
@@ -82,15 +82,15 @@ angular.module('myApp.contacts', ['ngRoute','firebase'])
     $scope.submitEditForm = function(){
         
         var record = $scope.contacts.$getRecord($scope.id);
-        record.name = $scope.name;
-        record.company = $scope.company;
-        record.email = $scope.email;
-        record.phones[0].work = $scope.work_phone;
-        record.phones[0].home = $scope.home_phone;
-        record.phones[0].mobile = $scope.mobile_phone;
-        record.address[0].city = $scope.city;
-        record.address[0].state = $scope.state;
-        record.address[0].country = $scope.country; 
+        record.name = $scope.name || null;
+        record.company = $scope.company || null;
+        record.email = $scope.email || null;
+        record.phones[0].work = $scope.work_phone || null;
+        record.phones[0].home = $scope.home_phone || null;
+        record.phones[0].mobile = $scope.mobile_phone || null;
+        record.address[0].city = $scope.city || null;
+        record.address[0].state = $scope.state || null;
+        record.address[0].country = $scope.country || null; 
         
         $scope.contacts.$save(record).then(function(ref){
             console.log(ref.key + ' is updated..');
@@ -115,6 +115,11 @@ angular.module('myApp.contacts', ['ngRoute','firebase'])
         $scope.country = contacts.address[0].country;
         
         $scope.showContactFlag = true;
+    };
+    
+    $scope.removeContact = function(contacts){
+        $scope.contacts.$remove(contacts);
+        $scope.msg = "Contact Removed";
     };
     
     var clearFields = function(){
