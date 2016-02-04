@@ -13,12 +13,33 @@ angular.module('myApp.contacts', ['ngRoute','firebase'])
     var ref = new Firebase('https://99bedes.firebaseio.com/contactDB');
     
     $scope.contacts = $firebaseArray(ref);
+    
     $scope.showAddForm = function(){
-      $scope.addFormShow = true;        
+      clearFields();    
+      $scope.addFormShowFlag = true;        
+    };
+
+    $scope.showEditForm = function(contacts){
+      $scope.editFormShowFlag = true; 
+      
+      clearFields();
+
+      $scope.id = contacts.$id;  
+      $scope.name = contacts.name;
+      $scope.company = contacts.company;
+      $scope.email = contacts.email;
+      $scope.work_phone = contacts.phones[0].work;
+      $scope.home_phone = contacts.phones[0].home;
+      $scope.mobile_phone = contacts.phones[0].mobile;
+      $scope.city = contacts.address[0].city;
+      $scope.state = contacts.address[0].state;
+      $scope.country = contacts.address[0].country;    
     };
     
     $scope.hideForm = function(){
-      $scope.addFormShow = false;    
+      $scope.addFormShowFlag = false; 
+      $scope.showContactFlag = false; 
+      $scope.editFormShowFlag = false; 
     };
     
     $scope.$watch('msg',function(){
@@ -41,10 +62,9 @@ angular.module('myApp.contacts', ['ngRoute','firebase'])
             ],
             address:[
                 {
-                    street:$scope.street_address || null,
                     city:$scope.city || null,
                     state:$scope.state || null,
-                    zipcode:$scope.zipcode || null
+                    country:$scope.country || null
                 }
             ]
 
@@ -54,10 +74,48 @@ angular.module('myApp.contacts', ['ngRoute','firebase'])
             
             clearFields();
             
-            $scope.addFormShow = false;
+            $scope.addFormShowFlag = false;
             $scope.msg = "Contact Added";
         });        
-    }
+    };
+    
+    $scope.submitEditForm = function(){
+        
+        var record = $scope.contacts.$getRecord($scope.id);
+        record.name = $scope.name;
+        record.company = $scope.company;
+        record.email = $scope.email;
+        record.phones[0].work = $scope.work_phone;
+        record.phones[0].home = $scope.home_phone;
+        record.phones[0].mobile = $scope.mobile_phone;
+        record.address[0].city = $scope.city;
+        record.address[0].state = $scope.state;
+        record.address[0].country = $scope.country; 
+        
+        $scope.contacts.$save(record).then(function(ref){
+            console.log(ref.key + ' is updated..');
+            clearFields();
+            $scope.editFormShowFlag = false;
+            $scope.msg = "Contact Updated";
+        });
+    };
+    
+    $scope.showContacts = function(contacts){
+        
+        clearFields();
+        
+        $scope.name = contacts.name;
+        $scope.company = contacts.company;
+        $scope.email = contacts.email;
+        $scope.work_phone = contacts.phones[0].work;
+        $scope.home_phone = contacts.phones[0].home;
+        $scope.mobile_phone = contacts.phones[0].mobile;
+        $scope.city = contacts.address[0].city;
+        $scope.state = contacts.address[0].state;
+        $scope.country = contacts.address[0].country;
+        
+        $scope.showContactFlag = true;
+    };
     
     var clearFields = function(){
         $scope.name = "";
@@ -66,9 +124,8 @@ angular.module('myApp.contacts', ['ngRoute','firebase'])
         $scope.mobile_phone = "";
         $scope.work_phone = "";
         $scope.home_phone = "";
-        $scope.street_address = "";
         $scope.city = "";
         $scope.state = "";
-        $scope.zipcode = "";
+        $scope.country = "";
     };
 }]);
